@@ -1,0 +1,383 @@
+\documentclass[11pt,review,sigplan,nonacm,natbib=false]{acmart}
+\settopmatter{printfolios=false,printccs=false,printacmref=false}
+\usepackage[utf8]{inputenc}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{tcolorbox}
+\usepackage{paralist}
+\usepackage{pgfplots}
+\usepackage{cleveref}
+\usepackage[maxnames=1,minnames=1,natbib=true,
+citestyle=numeric, bibstyle=numeric, sorting=none]{biblatex}
+\addbibresource{main.bib}  % Add file with references
+
+\title{Most Developers Do Not Consider Fixed Bugs as Quality Contribution}
+\author{Vitaly Alifanov, Kamil Almetov, Ivan Kornienko, Arsen Mutalapov, and Yegor Bugayenko}
+% \author[2]{Kamil Almetov}
+% \author[1]{Ivan Kornienko}
+% \author[2]{}
+% \author[3]{Vitaly Alifanov}
+% \author[4]{}
+\orcid{0000-0001-0000-0000}
+% \email{a.mutalapov@innopolis.university}
+\affiliation{\institution{Innopolis University}\city{Innopolis}\country{Russia}}
+
+\begin{document}
+
+\begin{abstract}
+One of the most reoccurring problems in programming for any developer is a bug, which leads to poor software quality and subjects the systems to fail. Many research in this area aim to study developers' opinions on debugging, tools, and systems, but none of them focus on the bug reports, which drastically impact one's opinion on software quality. Using open source XML parsing libraries and sample bug report we surveyed 102 respondents. We find that number of bugs report positively correlate with one's perception on software quality of the project, and that most of the programmers are not afraid to report bugs, despite the preference to read the manual before submitting the report.
+\end{abstract}
+
+\maketitle
+
+% Create table
+\begin{table*}
+    \begin{tabularx}{\textwidth}{l *{5}{r}}
+    \toprule
+    \multicolumn{1}{c}{Metric} & \multicolumn{1}{c}{xgen} & \multicolumn{1}{c}{SWXMLHash} 
+    & \multicolumn{1}{c}{Fuzi} & \multicolumn{1}{c}{quick-xml} & \multicolumn{1}{c}{libexpat} \\
+    \midrule
+    Closed bug reports & 2 & 29 & 1 & 64 & 79 \\
+    Stars & 276 & 1{,}345 & 1{,}049 & 982 & 918 \\
+    Lines of code & 3{,}777 & 4{,}407 & 7{,}027 & 17{,}837 & 652{,}333 \\
+    Release date (days ago)& 1{,}040 & 553 & 1{,}062 & 2{,}840 & 382 \\
+    Contributors & 11 & 38 & 21 & 86 & 83 \\
+    Closed issues & 18 & 140 & 57 & 264 & 286 \\
+    \multicolumn{1}{l}{Primary programming language} & \multicolumn{1}{l}{Go} & 
+    \multicolumn{1}{l}{Swift} & \multicolumn{1}{l}{Swift} & \multicolumn{1}{l}{Rust} & \multicolumn{1}{l}{C} \\
+    Last commit (days ago) & 126 & 179 & 176 & 2 & 10 \\
+    Forks & 66 & 196 & 149 & 205 & 422 \\
+    Number of closed pull requests & 22 & 114 & 45 & 333 & 466 \\
+    \bottomrule
+    \end{tabularx}
+\caption{This is a comparison table that contains XML parsing frameworks and metrics for them taken from GitHub. Respondents should put these libraries in the order from the most preferable to the least. Then, they should explain their choice and provide key metrics developers were based on.}
+\label{tab:frameworks}
+\end{table*}
+
+\section{Introduction}
+
+In the modern digital age, software plays a vital role in the society's everyday life. Many companies spend billions on software quality, including testing, debugging, and tools. In the US alone, the cost of operational systems failures in 2020 reached 1.56 trillion dollars \cite{PoorCost}. Emerging tools for code reviews, and development of better code quality practices \cite{CodePractices} ensure high-quality explanation of the risk of bugs and failures. In this study, we research the method to increase the quality of a software product by reporting bugs. Well-documented bug reports provide details, thus, the team may fix them in time and with low operational costs. However, an opinion on avoidance of bugs, rather than fixing them, exists among the programmers, but it has not been studied yet by the research community. Thus, we surveyed 100+ people about their perception of bug reporting and analyzed the results.
+
+Our primary focus is to establish whether programmers perceive a correlation between software quality and the volume of bug reports and to uncover the emotional aspects of bug reporting. These two points will allow us to confirm our thesis: we state that most software professionals consider bug reporting a quality-decreasing activity. In the Method section, we will proceed further to our research questions and how we found answers.
+
+The findings we obtained are original and contribute to the literature on the importance of bug reporting in software development. They can be used for further investigation of effective and qualitative software building. In the Results section, you can find the description of our findings, and in the Discussion section, we will describe the research contribution more.
+
+\section{Related Work}
+
+Software quality is being researched thoroughly, and the research-related studies are divided into several parts such as testing, debugging, and developers’ opinions.
+
+One of the papers that covered testing is research by Straubinger et. al. \cite{Testing}. Researchers surveyed 21 questions on whether or not developers, consultants, testers, and managers want to test the software. The results show that developers think of testing as mundane and tend to prioritize other tasks. Thus, one’s opinion on testing does not only rely on software quality but rather on personal motivation to improve the software. 
+
+Consequently, through a survey, Winter et. al. \cite{APR} considered 386 software developers’ opinions on automatic program repair tools (APR). One of the results was that programmers tend to use APR in testing to find bugs faster. Still, developers want to have either choice or control over the bug-fixing process because accuracy is a significant concern for most developers. Despite that, analysis of APR does not cover the perceptions toward software quality, but rather, a portion of it. Thus, a comprehensive study is still needed.
+
+% TODO: fix reference incorrect order
+Another paper on developers’ opinions about debugging was a survey conducted by Souza et. al. \cite{BugChanges}. Researchers involved 41 participants to answer three research questions regarding developers’ viewpoints about bug-introducing changes, reasons to agree with an assumption, and which assumptions are consensus/dissensus among viewpoints. The results about bug-introducing changes drew five opinions, and the most popular of them was “no matter the software history, only tests, and developers’ experience are important” with the belief that experienced developers introduce fewer bugs. However, the survey did not include the study of views about bugs, rather only about the consequences of bugs and low software quality.
+
+To conclude, the research community produces papers and surveys on software quality, testing, and debugging frequently. However, to the best of our knowledge, there was no research on the perception of programmers on the bug reporting process and its relation to the software quality.
+
+\section{Method}
+
+The main objective of the research is to determine the percentage of programmers who think that bug report is a quality-decreasing activity. It leads to the following research questions:
+\begin{enumerate}
+  \item Do programmers consider software quality being positively correlated with the number of bugs reported?
+  \item Do programmers feel comfortable when they report bugs?
+\end{enumerate}
+
+First, we compiled an online survey. The survey consists of two questions: the first finds answers for the RQ1, the second one - for the RQ2.
+
+The first question suggests choosing the highest quality projects (according to the interviewee) based on the metrics provided in the \cref{tab:frameworks} and explaining why. The answers reveal the importance of the amount of closed bug reports. Choosing it as a high priority means the respondents consider it crucial and positively correlated with the software quality.
+
+The second question reveals the feelings of a programmer while reporting a bug (\cref{fig:fig1}). The answers to this question can be split into two groups: 
+\begin{inparaenum}[1)]
+    \item real problems with the bug report,
+    and
+    \item ``emotional`` barriers that a programmer could and should ignore. Choosing answers from the second group means that they feel uncomfortable while reporting bugs.
+\end{inparaenum}
+
+\begin{figure}
+\begin{tcolorbox}[
+    standard jigsaw,
+    title=Bug report,
+    opacityback=0,
+    halign=left
+]
+\texttt{Error during login:} \par
+\texttt{Message with some errors is displayed when attempting to log in. No authentication token is obtained. I tried to log in with a valid username and password, but no auth token was received. I used logs to check the token}
+\newline
+\newline
+\texttt{To reproduce try to log in with:} \par
+\texttt{Login="login123" }\par
+\texttt{Password="password123" }
+\newline
+\newline
+\texttt{System information: }\par
+\texttt{Browser=Google Chrome} 
+\newline
+\newline
+\texttt{Attachments: }\par
+\texttt{3-minute video with authorization process}
+\newline
+\newline
+\texttt{Additional information: }\par
+\texttt{This issue started occurring after the latest system update. I have tried logging in on multiple devices and browsers, and the issue persists.}
+\end{tcolorbox}
+\caption{This is the bug report about some authentication problems. Respondents should choose from the given options what would they do to improve this report.}
+\label{fig:fig1}
+\end{figure}
+
+Options:
+\begin{enumerate}
+    \item Better explain how to reproduce it
+    \item Don't report, since it's a primitive bug
+    \item Get rid of the redundant 3--minute video
+    \item Instead, post to project chat, for a faster fix
+    \item Specify its priority and severity
+    \item Read user manual, maybe you do something wrong
+\end{enumerate}
+
+Second, these questions completely hide our research questions from the respondents. The first question has nine metrics besides bug reporting. The second question doesn't directly ask about feelings - it asks about the most harmful aspects of the particular bug report. We believe that hiding the research questions from the respondents will increase the results' objectiveness. Furthermore, the questions are situational since they make a human more engaged and interested in answering.
+
+Third, we decided to produce only a quantitative analysis of the survey answers. So, we will state what percentage of developers follow our hypothesis mentioned in the introduction.
+
+In compiling the questions, we were guided by the criteria in the related book \cite{QuestionnaireBook}. In particular, we were guided by the brevity and simplicity of the questions to take the least time for the interviewee to reach as large an audience as possible. 
+
+Fourth, we involved 100 programmers from different companies to take the survey.
+
+Fifth, we analyzed the answers.
+
+All participants in the experiment provided agreed to participate in the study.
+
+\section{Results}
+
+% Apply the Method, step by step, to the real data.
+
+% Present your findings using tables and graphs.
+
+% Post your input data, intermediate data, and all output data in a public GitHub repository. Refer to it.
+
+In total, we collected 102 answers, 80 of them were from the original English version of our Google form and 22 were from Russian translated version. The link to the surveys and the final analysis of the table with answers are available on GitHub \cite{Mutalapov_Survey_on_the_2023}.
+
+\subsection{RQ 1: Do programmers consider software quality being positively correlated with the number of bugs reported?}
+
+Survey respondents were asked to place different XML parsing libraries from most preferable to the least. The resulting distribution is shown on \cref{tab:tab2}, showing that libraries with more closed bug reports and closed issues (libexpat and quick-xml) are preferable. However, when we asked the respondent to answer "What are the metrics you were based on?", we revealed that the main metrics are the number of stars, primary programming language, and number of days from the last commit (that quick-xml and libexpat have the least - 2 and 10 days). The distribution of chosen metrics is shown on \cref{tab:tab3} indicating how much these metrics were reported by a respondent as the first or primary choice. Even though 34 respondents considered bug reports and issues when choosing the library with the higher quality, these metrics are not determinant taking the 4th and  7th places among primary factors.
+
+%(quick-xml and libexpat are chosen as top 1 and 2 and xgen with Fuzi - top 4 and 5).
+
+\begin{table}
+    \begin{tabular}{l *{5}{r}}
+    \hline
+    \multicolumn{1}{c}{Framework} &  \multicolumn{1}{c}{Top1} &  \multicolumn{1}{c}{Top2} &  \multicolumn{1}{c}{Top3} &  \multicolumn{1}{c}{Top4} &  \multicolumn{1}{c}{Top5} \\
+    \hline
+    libexpat & 28 & 28 & 13 & 9 & 24 \\
+    \hline
+    quick-xml & 36 & 22 & 20 & 17 & 7 \\
+    \hline
+    SWXMLHash & 25 & 26 & 26 & 15 & 10 \\
+    \hline
+    xgen & 8 & 10 & 17 & 20 & 47 \\
+    \hline
+    Fuzi & 5 & 16 & 26 & 41 & 14 \\
+    \hline
+    \end{tabular}
+\caption{This table demonstrates metrics and their priorities. Top1 indicates the highest priority, and Top5 means the least priority.}
+\label{tab:tab2}
+\end{table}
+
+% \begin{figure}
+% \begin{tikzpicture}
+% \pgfplotsset{width=8.5cm,compat=1.8}
+% \begin{axis}[
+%     ybar,
+%         bar width=18pt,
+%     enlargelimits=0.15,
+%     legend style={at={(0.5,-0.15)},
+%       anchor=north,legend columns=-1},
+%     ylabel={votes per option},
+%     symbolic x coords={Option1,Option2,Option3,Option4,Option5,Option6},
+%     xtick=data,
+%     x tick label style={rotate=45,anchor=east},
+%     nodes near coords,
+%         nodes near coords style={black},
+%         nodes near coords align={vertical},
+%     ]
+% \addplot+[fill=lightgray,draw=black] coordinates {(Option1,60) (Option2,4) (Option3,42) (Option4,20) (Option5,66) (Option6,49)};
+% \end{axis}
+% \end{tikzpicture}
+% \caption{This is the bar plot that shows how many votes are assigned to each option. Options with their enumeration order are mentioned in the Method section.}
+% \label{fig:fig2}
+% \end{figure}
+
+\begin{table}
+    \begin{tabular}{lrr}
+    \hline
+     \multicolumn{1}{c}{Metric} &  \multicolumn{1}{c}{Top priority} &  \multicolumn{1}{c}{Rest priority} \\
+    \hline
+    Closed bug reports & 8 & 26 \\
+    \hline
+    Stars & 28 & 26 \\
+    \hline
+    Lines of code & 6 & 26 \\
+    \hline
+    Release date (days ago) & 8 & 23 \\
+    \hline
+    Contributors & 5 & 29 \\
+    \hline
+    Closed issues & 5 & 29 \\
+    \hline
+    Primary language & 21 & 21 \\
+    \hline
+    Last commit (days ago) & 11 & 34 \\
+    \hline
+    Forks & 4 & 19 \\
+    \hline
+    Closed pull requests & 1 & 10 \\
+    \hline
+    \end{tabular}
+\caption{This table is similar to \cref{tab:tab4}. However, it only produces how a specific metric is chosen as the highest priority and the rest kinds of priorities.}
+\label{tab:tab3}
+\end{table}
+  
+\begin{table}
+    \centering
+    \begin{tabular}{ccccccc}
+    \hline
+    & Op 1 & Op 2 & Op 3 & Op 4 & Op 5 & Op 6 \\
+    \hline
+    % Votes & \multicolumn{1}{r}{60} & \multicolumn{1}{r}{4} & \multicolumn{1}{r}{42} & \multicolumn{1}{r}{20} & \multicolumn{1}{r}{66} & \multicolumn{1}{r}{49} \\
+    \multicolumn{1}{l}{Votes} & \multicolumn{1}{r}{60} & \multicolumn{1}{r}{4} & \multicolumn{1}{r}{42} & \multicolumn{1}{r}{20} & \multicolumn{1}{r}{66} & \multicolumn{1}{r}{49} \\
+    \hline
+    \end{tabular}
+\caption{This table shows how many votes are assigned to each option. "Op" means "Option", and options with their enumeration order are mentioned in the Method section.}
+\label{tab:tab4}
+\end{table}
+
+% \begin{figure}
+% \begin{tikzpicture}
+% \pgfplotsset{width=8.5cm,compat=1.8}
+% \begin{axis}[
+%     ybar,
+%         bar width=50pt,
+%     enlargelimits={abs=2cm},
+%     legend style={at={(0.5,-0.15)},
+%       anchor=north,legend columns=-1},
+%     ylabel={votes per option type},
+%     symbolic x coords={Technical, Emotional},
+%     xtick=data,
+%     x tick label style={rotate=45,anchor=east},
+%     nodes near coords,
+%         nodes near coords style={black},
+%         nodes near coords align={vertical},
+%     ]
+% \addplot+[fill=lightgray,draw=black] coordinates {(Technical,73) (Emotional,168)};
+% \end{axis}
+% \end{tikzpicture}
+% \caption{This is the bar chart that indicates how many votes the technical and emotional group of possible options contain. The technical group includes Options 2, 4, and 6, while the emotional set contains Options 1, 3, and 5.}
+% \label{fig:fig3}
+% \end{figure}
+
+% p for top aligned,
+% m for vertically centered,
+% b for bottom aligned
+% \begin{table}
+%     \begin{tabular}{ccccccc}
+%     \hline
+%     Number & Technical & Emotional \\
+%     \hline
+%     \multicolumn{1}{l}{Votes} &  \multicolumn{1}{r}{73} &  \multicolumn{1}{r}{168} \\
+%     \hline
+%     \end{tabular}
+% \caption{This table indicates how many votes the technical and emotional group of possible options contain. The technical group includes Options 2, 4, and 6, while the emotional set contains Options 1, 3, and 5.}
+% \label{tab:tab3}
+% \end{table}
+
+In answer to RQ 1, we say that programmers consider software quality to be positively correlated with the number of bugs reported but the correlation between quality and number of bugs is not strong. Exactly 33\% of respondents can answer "yes" to the RQ 1. The respondents' answers demonstrate that developers pay more attention to quality-unrelated metrics such as programming language and number of days since the last commit.
+
+\subsection{RQ 2: Do programmers feel comfortable when they report bugs?}
+
+We showed a bug report related to an authentication problem and provided 6 possible options to act. Three of them were focused on specific improvements and further reporting, and another three were related to avoidance of reporting. \cref{tab:tab4} shows the distribution of chosen options on the request "What would you do to improve the bug report?". In total, we got 2.5 times more votes about technical improvements (167) rather than mental avoidance (68). Thus, the majority of voters (60\%) are okay with reporting this bug. In addition, 40\% of respondents chose only technical options.
+
+% \begin{figure}
+% \begin{tikzpicture}
+% \pgfplotsset{width=8.5cm,height=10cm}
+% \begin{axis}[
+%     ybar stacked,
+% 	bar width=18pt,
+% 	nodes near coords,
+%         nodes near coords style={black},
+%     enlargelimits=0.15,
+%     legend style={at={(0.5,-0.25)},
+%       anchor=north,legend columns=-1},
+%     ylabel={Votes per framework},
+%     symbolic x coords={libexpat, quick-xml, SWXMLHash, xgen, Fuzi},
+%     xtick=data,
+%     x tick label style={rotate=45,anchor=east},
+%     ]
+% \addplot+[ybar,draw=black] plot coordinates {(libexpat,28) (quick-xml,36) (SWXMLHash,25) (xgen,8) (Fuzi,5)};
+% \addplot+[ybar,draw=black] plot coordinates {(libexpat,28) (quick-xml,22) (SWXMLHash,26) (xgen,10) (Fuzi,16)};
+% \addplot+[ybar, fill=green,draw=black] plot coordinates {(libexpat,13) (quick-xml,20) (SWXMLHash,26) (xgen,17) (Fuzi,26)};
+% \addplot+[ybar, fill=orange,draw=black] plot coordinates {(libexpat,9) (quick-xml,17) (SWXMLHash,15) (xgen,20) (Fuzi,41)};
+% \addplot+[ybar, fill=yellow,draw=black] plot coordinates {(libexpat,24) (quick-xml,7) (SWXMLHash,10) (xgen,47) (Fuzi,14)};
+% \legend{\strut top1, \strut top2, \strut top3, \strut top4, \strut top5}
+% \end{axis}
+% \end{tikzpicture}
+% \caption{This is the stacked bar plot which demonstrates metrics and their priorities. Top1 legend indicates the highest priority, and top5 means the least priority. The blue area shows how many people chose a specific metric as top1 priority, the pink area - top2 priority, and so on.}
+% \label{fig:fig4}
+% \end{figure}
+
+% \begin{figure}
+% \begin{tikzpicture}
+% \pgfplotsset{width=8.5cm,compat=1.8}
+% \begin{axis}[
+%     ybar stacked,
+% 	bar width=15pt,
+% 	nodes near coords,
+%         nodes near coords style={black},
+%     enlargelimits=0.15,
+%     legend style={at={(0.5,-0.35)},
+%       anchor=north,legend columns=-1},
+%     ylabel={Votes per metric},
+%     symbolic x coords={Bugs, Stars, LOC, Release, Contributors, Issues, Lang, Commits, Forks, Pull requests},
+%     xtick=data,
+%     x tick label style={rotate=45,anchor=east},
+%     ]
+% \addplot+[ybar,fill=gray,draw=black] plot coordinates {(Bugs,8) (Stars,28) (LOC,6) (Release,8) (Contributors,5) (Issues,5) (Lang,21) (Commits,11) (Forks,4) (Pull requests,1)};
+% \addplot+[ybar,fill=lightgray,draw=black] plot coordinates {(Bugs,26) (Stars,26) (LOC,26) (Release,23) (Contributors,29) (Issues,29) (Lang,21) (Commits,34) (Forks,19) (Pull requests,10)};
+% \legend{\strut Primary, \strut Not primary}
+% \end{axis}
+% \end{tikzpicture}
+% \caption{This is the stacked bar chart which is similar to \cref{fig:fig4}. However, it only produces how a specific metric is chosen as the highest priority (green color) and the rest kinds of priorities (orange color). The total number of votes per metric is specified in the orange area.}
+% \label{fig:fig5}
+% \end{figure}
+
+Summarizing these results, we can state that programmers are not afraid of bug reporting. However, about half of them feel uncertain and prefer to read a manual before submitting a report.
+
+\section{Discussion}
+
+% 1st paragraph.
+% 1.1. Provide the essential interpretation based on key findings.
+% 1.2. Include a main piece of supporting evidence
+
+Even though we put an emphasis on quality, some developers referred to the term "popularity". The choice of popularity and stars might be so that developers put their responsibility of choice to others even though we asked them to choose themselves considering the quality.
+
+% 2nd paragraph.
+% 2.1 Compare and contrast to previous studies.
+% 2.2 Highlight the strengths and limitations of the study
+% 2.3 Discuss any unexpected findings
+
+While other researchers were asking about respondents' opinions and viewpoints, our method included situational questions which supplied more truthful answers. Due to such methodology, a respondent treats a question as a real-life situation, and this is the key strength of our study. However, there are limitations. One of them is the number of participants. 102 people is a relatively small rate to describe the common thinking of a software developer. The other limitation appears in the option list for the 2nd question. People may rely on different behavior that is not listed in specified options, and we do not provide an opportunity for them to write their own opinion. Our team also found that about half of the programmers do not feel any ambiguity when dealing with external bug reports.
+
+% 3rd paragraph.
+% 3.1 Summarize the hypothesis and purpose of the study
+% 3.2 Highlight the significance of the study
+% 3.3 Discuss unanswered questions and potential future research
+
+Overall, our hypothesis was "most software developers consider bug reporting as a quality-decreasing activity", and the purpose of the study was to assess such assumption. The concise method with real bug report evaluation makes the research significant for developer thinking analysis. However, there is an unanswered question: why many of the respondents chose libraries with closed bug reports and closed issues but the metrics they were based on are number of stars, primary programming language, and days from the last commit? Suppose, one of the potential future researchers could answer such a question by investigating how often a person trusts the majority rather than making their own decision using objective measurements.
+ 
+\section{Conclusion}
+
+In conclusion, our research got into the attitudes of over 100 software professionals toward bug reporting and its impact on software quality. Contrary to our initial hypothesis, diverse priorities emerged, with 33\% valuing closed issues while others favored popular libraries based on factors like stars and forks. The situational questions in our methodology provided unique insights, revealing unexpected findings such as nearly half of programmers feeling no ambiguity with external bug reports. While our study contributes valuable viewpoints, accepting limitations such as the small sample size and predefined survey options in the second question is essential. The difference between developers choosing libraries based on closed bug reports and their dependence on alternative metrics offers a possible route for future research, highlighting the developing nature of decision-making processes in software development.
+
+\printbibliography
+
+\end{document}
